@@ -15,13 +15,13 @@ const AppContainer = ({ children, setContainerRef }: AppContainerProps) => {
   }, [containerRef, setContainerRef]);
 
   return (
-    <>
+    <div className="w-full h-full overflow-hidden">
       <div className="w-full h-full relative z-10" ref={containerRef}>
         {children}
       </div>
       {/* Items at random locations inside beach, not overlapping */}
       <div className="w-full h-full beach z-0" />
-    </>
+    </div>
   );
 };
 
