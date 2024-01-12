@@ -3,20 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
 }
 
 body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -24,4 +19,147 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+.beach {
+  background-image: url("/beach/sand-1.png");
+  image-rendering: pixelated;
+  background-repeat: repeat;
+  transform: scale(3);
+}
+
+.character {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/characters/char1.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.shirt {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/clothes/basic.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.pants {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/clothes/pants.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.shoes {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/clothes/shoes.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.hair {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/hair/french_curl.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.lipstick {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/eyes/lipstick.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.eyes {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/eyes/eyes.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  transform: scale(5);
+  image-rendering: pixelated;
+}
+
+.blush {
+  width: 32px;
+  height: 32px;
+  background-image: url("/pack/eyes/blush_all.png");
+  animation: spriteAnimation 1s steps(8) infinite;
+  image-rendering: pixelated;
+  transform: scale(5);
+}
+
+.char-shadow {
+  width: 16px;
+  height: 16px;
+  background-image: url("/pack/shadow.png");
+  transform: scale(5);
+  image-rendering: pixelated;
+  bottom: -128px;
+}
+
+.down {
+  background-position-y: 0px;
+  animation: spriteAnimation 1s steps(8) infinite;
+}
+
+.up {
+  background-position-y: -32px;
+  animation: spriteAnimation 1s steps(8) infinite;
+}
+
+.left {
+  background-position-y: -96px;
+  animation: spriteAnimation 1s steps(8) infinite;
+}
+
+.right {
+  background-position-y: -64px;
+  animation: spriteAnimation 1s steps(8) infinite;
+}
+
+.idle {
+  background-position-x: 0;
+  animation: none;
+}
+
+.twitch {
+  background-position-x: 0px;
+  animation: none;
+}
+
+.twitch.down {
+  background-position-y: -768px;
+}
+
+.twitch.up {
+  background-position-y: -800px;
+}
+
+.twitch.left {
+  background-position-y: -864px;
+}
+
+.twitch.right {
+  background-position-y: -832px;
+}
+
+@keyframes spriteAnimation {
+  from {
+    background-position-x: 0px;
+  }
+  to {
+    background-position-x: -256px;
+  }
 }
