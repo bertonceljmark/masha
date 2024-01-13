@@ -1,15 +1,19 @@
-import clientPromise from "@/lib/mongodb";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const client = await clientPromise;
-  const collection = client.db("pikolino").collection("stats");
+  const masha = await prisma.character.findFirst({
+    where: { name: "Masha" },
+  });
 
-  const updated = await collection.findOneAndUpdate(
-    { name: "Masha", itemCount: { $lt: 8 } },
-    { $inc: { itemCount: 1 } },
-    { returnDocument: "after" }
-  );
+  const updated = await prisma.character.update({
+    where: { id: masha?.id, itemCount: { lt: 8 } },
+    data: {
+      itemCount: {
+        increment: 1,
+      },
+    },
+  });
 
   return NextResponse.json({ status: "success", data: updated });
 }
