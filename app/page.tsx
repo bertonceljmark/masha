@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import Character from "@/components/character";
 import Overlay from "@/components/overlay";
 import { RefObject, useCallback, useMemo, useRef, useState } from "react";
