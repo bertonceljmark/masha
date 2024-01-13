@@ -13,7 +13,7 @@ export default function Home() {
   const [containerRef, setContainerRef] =
     useState<RefObject<HTMLDivElement> | null>(null);
 
-  const { wineGlassesNumber, feed, health } = useApiData();
+  const { wineGlassesNumber, feed, health, loading } = useApiData();
 
   const onCharacterStop = useCallback(() => {
     if (itemsRef.current && characterRef?.current) {

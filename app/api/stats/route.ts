@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     status: "success",
     data: {
       ...masha,
-      hungerLevel: parseInt(masha?.hungerLevel?.toString() || "0"),
+      hungerLevel: parseInt(((masha?.hungerLevel || 0) / 100)?.toString()),
     },
   });
 }
