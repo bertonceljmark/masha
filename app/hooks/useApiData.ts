@@ -7,7 +7,7 @@ const useApiData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch("/api/stats", { signal });
+      const response = await fetch("/api/stats", { cache: "no-store" });
       const data = await response.json();
 
       setHealth(data.data.hungerLevel);
@@ -19,7 +19,7 @@ const useApiData = () => {
 
   const feed = async () => {
     setHealth((prev) => prev + 1);
-    await fetch("/api/feed", { signal });
+    await fetch("/api/feed", { cache: "no-store" });
   };
 
   return {
