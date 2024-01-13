@@ -5,7 +5,10 @@ interface AppContainerProps {
   setContainerRef: (ref: RefObject<HTMLDivElement> | null) => void;
 }
 
-const AppContainer = ({ children, setContainerRef }: AppContainerProps) => {
+const PlaygroundContainer = ({
+  children,
+  setContainerRef,
+}: AppContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,10 +22,9 @@ const AppContainer = ({ children, setContainerRef }: AppContainerProps) => {
       <div className="w-full h-full relative z-10" ref={containerRef}>
         {children}
       </div>
-      {/* Items at random locations inside beach, not overlapping */}
       <div className="w-full h-full beach z-0" />
     </div>
   );
 };
 
-export default AppContainer;
+export default PlaygroundContainer;

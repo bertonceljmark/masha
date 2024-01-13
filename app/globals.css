@@ -21,6 +21,29 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.wine-glass {
+  height: 3rem;
+  width: 40px;
+  position: absolute;
+  image-rendering: pixelated;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url("/items/wine-glass.png");
+}
+
+.health-bar {
+  width: 64px;
+  height: 16px;
+  background-image: url("/UI/health-bar.png");
+  image-rendering: pixelated;
+  transform: scale(5);
+  margin: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2.5rem;
+}
+
 .beach {
   background-image: url("/beach/sand-1.png");
   image-rendering: pixelated;

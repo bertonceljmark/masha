@@ -1,12 +1,20 @@
-import React, { MouseEvent, RefObject, useMemo, useRef, useState } from "react";
+import React, {
+  MouseEvent,
+  RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { motion } from "framer-motion";
 import useCharacterMovement from "@/app/hooks/useCharacterMovement";
 import CharacterPart from "./characterPart";
-import useChat from "@/app/hooks/useChat";
 import CharacterText from "./characterText";
 
 interface CharacterProps {
   containerRef: RefObject<HTMLDivElement>;
+  onCharacterStop: (rect: DOMRect) => void;
+  characterRef: RefObject<HTMLDivElement>;
 }
 
 const parts = [
@@ -19,9 +27,11 @@ const parts = [
   "eyes",
   "blush",
 ];
-const Character = ({ containerRef }: CharacterProps) => {
-  const characterRef = useRef<HTMLDivElement>(null);
-
+const Character = ({
+  containerRef,
+  onCharacterStop,
+  characterRef,
+}: CharacterProps) => {
   const {
     destinationCoordinates,
     transitionDuration,
@@ -35,6 +45,11 @@ const Character = ({ containerRef }: CharacterProps) => {
     containerRef,
   });
 
+  useEffect(() => {
+    if (isIdle && characterRef.current) {
+      onCharacterStop(characterRef.current.getBoundingClientRect());
+    }
+  }, [isIdle, characterRef, onCharacterStop]);
   return (
     <motion.div
       className="w-32 h-32 absolute cursor-pointer"
