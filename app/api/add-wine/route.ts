@@ -9,7 +9,7 @@ export async function GET() {
   });
 
   const updated = await prisma.character.update({
-    where: { id: masha?.id, itemCount: { lt: 8 } },
+    where: { id: masha?.id, itemCount: { lt: 4 } },
     data: {
       itemCount: {
         increment: 1,

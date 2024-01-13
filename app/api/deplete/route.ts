@@ -12,7 +12,7 @@ export async function GET() {
     where: { id: masha?.id, itemCount: { gt: 0 } },
     data: {
       hungerLevel: {
-        increment: -1,
+        increment: -0.25,
       },
     },
   });
