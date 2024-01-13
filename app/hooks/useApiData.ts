@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+const { signal } = new AbortController();
 
 const useApiData = () => {
   const [health, setHealth] = useState(0);
@@ -6,7 +7,7 @@ const useApiData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch("/api/stats");
+      const response = await fetch("/api/stats", { signal });
       const data = await response.json();
 
       setHealth(data.data.hungerLevel);
@@ -18,7 +19,7 @@ const useApiData = () => {
 
   const feed = async () => {
     setHealth((prev) => prev + 1);
-    await fetch("/api/feed");
+    await fetch("/api/feed", { signal });
   };
 
   return {
