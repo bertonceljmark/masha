@@ -1,48 +1,75 @@
-import { useEffect, useMemo, useState } from "react";
-
+import { AIChatContext } from "@/contexts/AIChatContext";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { getDelay, TEXT_SPEED } from "@/helpers/chatHelper";
 const possibleRandomMessages = ["čuj", "kuuuuuurba", "pikolino"];
 
 const useChat = () => {
   const [message, setMessage] = useState("");
+  const { message: aiMessage, setMessage: setAIMessage } =
+    useContext(AIChatContext);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const randomMessage =
-        possibleRandomMessages[
-          Math.floor(Math.random() * possibleRandomMessages.length)
-        ];
+    if (aiMessage) {
+      setMessage(aiMessage);
+      const totalDuration = getDelay(aiMessage);
 
-      setMessage(randomMessage);
-    }, 20000);
+      // Set a timeout to clear aiMessage after the animation completes
+      const timeout = setTimeout(() => {
+        setAIMessage("");
+      }, totalDuration);
 
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearTimeout(timeout);
+    } else {
+      const interval = setInterval(() => {
+        const randomMessage =
+          possibleRandomMessages[
+            Math.floor(Math.random() * possibleRandomMessages.length)
+          ];
+
+        setMessage(randomMessage);
+      }, 20000);
+
+      return () => clearInterval(interval);
+    }
+  }, [aiMessage, setAIMessage]);
 
   const sequence = useMemo(() => {
     if (!message) return [];
 
-    const dots = [".", "..", "...", "..", "."];
-    const delay = 150;
+    const words = message.split(/\s+/);
+    const chunks =
+      words.length > 5
+        ? Array.from({ length: Math.ceil(words.length / 5) }, (_, i) =>
+            words.slice(i * 5, i * 5 + 5).join(" ")
+          )
+        : [message];
 
-    const dotsWithDelay = dots.map((dot, index) => [dot, delay]).flat();
+    const delay = TEXT_SPEED;
+    const finalSequence: (string | number)[] = [];
 
-    const messageArray = message.split("");
+    ["", ".", "..", "...", "..", "."].forEach((dot) => {
+      finalSequence.push(dot, delay);
+    });
 
-    const gradualMessageArray = messageArray.map((letter, index) =>
-      messageArray.slice(0, index + 1).join("")
-    );
+    chunks.forEach((chunk) => {
+      const letters = chunk.split("");
 
-    const messageArrayWithDelay = gradualMessageArray
-      .map((letter) => [letter, delay])
-      .flat();
+      const gradualMessageArray = letters.map((letter, index) =>
+        letters.slice(0, index + 1).join("")
+      );
 
-    const finalSequence = [
-      ...dotsWithDelay,
-      ...messageArrayWithDelay,
-      3000,
-      ...messageArrayWithDelay.reverse(),
-      "",
-    ];
+      gradualMessageArray.forEach((message) => {
+        finalSequence.push(message, delay);
+      });
+
+      finalSequence.push(1000);
+
+      gradualMessageArray.reverse().forEach((message) => {
+        finalSequence.push(message, delay / 10);
+      });
+
+      finalSequence.push("", delay);
+    });
 
     return finalSequence;
   }, [message]);

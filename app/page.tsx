@@ -6,6 +6,8 @@ import { RefObject, useCallback, useMemo, useRef, useState } from "react";
 import PlaygroundContainer from "@/components/playgroundContainer";
 import WineGlasses from "@/components/wineGlasses";
 import useApiData from "./hooks/useApiData";
+import AiInput from "@/components/AiInput";
+import { AIChatProvider } from "@/contexts/AIChatContext";
 
 export default function Home() {
   const characterRef = useRef<HTMLDivElement>(null);
@@ -13,16 +15,15 @@ export default function Home() {
   const [containerRef, setContainerRef] =
     useState<RefObject<HTMLDivElement> | null>(null);
 
-  const { wineGlassesNumber, feed, health } = useApiData();
+  const { wineGlassesNumber, feed, health, loading } = useApiData();
 
-  const onCharacterStop = useCallback(() => {
+  const onCharacterMove = useCallback(() => {
     if (itemsRef.current && characterRef?.current) {
       const characterRect = characterRef.current.getBoundingClientRect();
       itemsRef.current.forEach((item) => {
         if (item.current) {
           const itemRect = item.current.getBoundingClientRect();
 
-          //detect collision
           if (
             itemRect.x < characterRect.x + characterRect.width &&
             itemRect.x + itemRect.width > characterRect.x &&
@@ -53,14 +54,16 @@ export default function Home() {
   }, [containerRef]);
 
   const wineGlassesPositions = useMemo(() => {
-    return [...Array(wineGlassesNumber)].map((_, i) => ({
-      ...getWineGlassPosition(),
-      id: i,
-    }));
+    return [...Array(wineGlassesNumber > 0 ? wineGlassesNumber : 0)].map(
+      (_, i) => ({
+        ...getWineGlassPosition(),
+        id: i,
+      })
+    );
   }, [wineGlassesNumber, getWineGlassPosition]);
 
   return (
-    <>
+    <AIChatProvider>
       <PlaygroundContainer setContainerRef={setContainerRef}>
         <WineGlasses
           wineGlassesNum={wineGlassesNumber}
@@ -70,12 +73,13 @@ export default function Home() {
         {containerRef && (
           <Character
             containerRef={containerRef}
-            onCharacterStop={onCharacterStop}
+            onCharacterMove={onCharacterMove}
             characterRef={characterRef}
           />
         )}
       </PlaygroundContainer>
       <Overlay health={health} />
-    </>
+      <AiInput />
+    </AIChatProvider>
   );
 }

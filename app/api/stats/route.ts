@@ -8,6 +8,11 @@ export async function GET(request: NextRequest) {
     where: { name: "Masha" },
   });
 
-  console.log(masha);
-  return NextResponse.json({ status: "success", data: masha });
+  return NextResponse.json({
+    status: "success",
+    data: {
+      ...masha,
+      hungerLevel: parseInt(((masha?.hungerLevel || 0) / 100)?.toString()),
+    },
+  });
 }

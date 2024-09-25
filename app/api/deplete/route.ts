@@ -8,13 +8,18 @@ export async function GET() {
     where: { name: "Masha" },
   });
 
-  const updated = await prisma.character.update({
-    where: { id: masha?.id, itemCount: { gt: 0 } },
-    data: {
-      hungerLevel: {
-        increment: -1,
+  if (masha?.hungerLevel !== undefined && masha.hungerLevel > 0) {
+    const updated = await prisma.character.update({
+      where: { id: masha?.id },
+      data: {
+        hungerLevel: {
+          set: masha.hungerLevel - 25,
+        },
       },
-    },
-  });
-  return NextResponse.json({ status: "success", data: updated });
+    });
+
+    return NextResponse.json({ status: "success", data: updated });
+  }
+
+  return NextResponse.json({ status: "success", data: null });
 }

@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useRef } from "react";
 
 interface UseCharacterMovementProps {
   characterRef: RefObject<HTMLDivElement>;
@@ -24,7 +25,10 @@ const useCharacterMovement = ({
   const [destinationCoordinates, setDestinationCoordinates] = useState<{
     x: number;
     y: number;
-  } | null>(null);
+  } | null>({
+    x: containerRef.current?.clientWidth || 0 / 2,
+    y: containerRef.current?.clientHeight || 0 / 2,
+  });
 
   const destinationCoordinatesWithOffset = useMemo(() => {
     if (!destinationCoordinates || !characterRef.current) {
@@ -54,11 +58,6 @@ const useCharacterMovement = ({
 
         const x = e.clientX - containerRect.left;
         const y = e.clientY - containerRect.top;
-
-        setTimeout(() => {
-          setIsIdle(false);
-          setLastMoveTime(Date.now());
-        });
 
         setDestinationCoordinates({ x, y });
       }
@@ -114,28 +113,9 @@ const useCharacterMovement = ({
     };
   }, [containerRef, handleContainerClick, handleContainerScreenPress]);
 
-  const transitionDuration = useMemo(() => {
-    if (!destinationCoordinates) {
-      return 0;
-    }
-
-    if (!characterRef.current) {
-      return 0;
-    }
-
-    const characterRect = characterRef.current.getBoundingClientRect();
-
-    const distance = Math.sqrt(
-      Math.pow(destinationCoordinates.x - characterRect.left, 2) +
-        Math.pow(destinationCoordinates.y - characterRect.top, 2)
-    );
-
-    return distance / MOVE_SPEED;
-  }, [destinationCoordinates, characterRef]);
-
   useEffect(() => {
     const interval = setInterval(() => {
-      if (Date.now() - lastMoveTime > 5000 + transitionDuration * 1000) {
+      if (Date.now() - lastMoveTime > 5000 && isIdle) {
         if (containerRef.current) {
           const containerRect = containerRef.current.getBoundingClientRect();
 
@@ -148,7 +128,7 @@ const useCharacterMovement = ({
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [lastMoveTime, containerRef, transitionDuration]);
+  }, [lastMoveTime, containerRef, isIdle]);
 
   const action: "left" | "right" | "up" | "down" | "idle" = useMemo(() => {
     if (!destinationCoordinatesWithOffset || !characterRef.current)
@@ -171,24 +151,74 @@ const useCharacterMovement = ({
     return isIdle;
   }, [twitch, action, isIdle]);
 
-  const handleAnimationEnd = () => {
+  const handleAnimationEnd = useCallback(() => {
     setIsIdle(true);
     setLastMoveTime(Date.now());
-  };
+  }, []);
 
-  const handleAnimationStart = () => {
-    setIsIdle(false);
-    setLastMoveTime(Number.MAX_SAFE_INTEGER);
-  };
+  const animationFrameId = useRef<number | null>(null);
+
+  const [currentPosition, setCurrentPosition] = useState<{
+    x: number;
+    y: number;
+  }>({
+    x: containerRef.current?.clientWidth
+      ? containerRef.current.clientWidth / 2
+      : 0,
+    y: containerRef.current?.clientHeight
+      ? containerRef.current.clientHeight / 2
+      : 0,
+  });
+
+  const updatePosition = useCallback(() => {
+    if (destinationCoordinatesWithOffset) {
+      const { x, y } = destinationCoordinatesWithOffset;
+      setCurrentPosition((prev) => {
+        const dx = x - prev.x;
+        const dy = y - prev.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // character reached destination
+        if ((!distance || distance < 1) && !isIdle) {
+          handleAnimationEnd();
+          return { x: prev.x, y: prev.y };
+        }
+
+        // character is idle
+        if (!distance || distance < 1) {
+          return { x: prev.x, y: prev.y };
+        }
+
+        // character is moving
+        if (distance && distance >= 2 && isIdle) {
+          setIsIdle(false);
+        }
+
+        const angle = Math.atan2(dy, dx);
+        return {
+          x: prev.x + MOVE_SPEED * Math.cos(angle) * (1 / 60),
+          y: prev.y + MOVE_SPEED * Math.sin(angle) * (1 / 60),
+        };
+      });
+    }
+
+    animationFrameId.current = requestAnimationFrame(updatePosition);
+  }, [destinationCoordinatesWithOffset, handleAnimationEnd, isIdle]);
+
+  useEffect(() => {
+    animationFrameId.current = requestAnimationFrame(updatePosition);
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [updatePosition]);
 
   return {
-    destinationCoordinates: destinationCoordinatesWithOffset,
-    transitionDuration,
     isIdle: idle,
     action,
     twitch,
-    handleAnimationEnd,
-    handleAnimationStart,
+    currentPosition,
   };
 };
 
